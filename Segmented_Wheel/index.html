@@ -74,6 +74,13 @@
                 </tr>
             </table>
         </div>
+        <input id="file-selector" type="file" webkitdirectory="" directory="" multiple>
+        <br />
+
+        <!-- Where the options will appear -->
+        <div class="options" id="option-container">
+        </div> <!-- This keeps the script from becoming part of the div -->
+        
         <div>
             <p>Tile 1</p>
             <select id="Tile_1" name="Tile_1" onchange="tile_change(1, this.value);" >
@@ -81,22 +88,16 @@
                 <option id="2" value="Car_Tile.png">Car</option>
                 <option id="3" value="Chair_Tile.png">Chair</option>
             </select>
-            
+
             <p>Tile 2</p>
             <select id="Tile_2" name="Tile_2" onchange="tile_change(2, this.value);" >
                 <option id="1" selected="selected" value="Bat_Tile.png" >Bat</option>
                 <option id="2" value="Car_Tile.png">Car</option>
                 <option id="3" value="Chair_Tile.png">Chair</option>
             </select>
+        </div>
 
-            
-        </div>
-        </div>
         <script>
-                       
-            
-                      
-            
             // Create new wheel object specifying the parameters at creation time.
             let theWheel = new Winwheel({
                 'numSegments'       : 10,                 // Specify number of segments.
@@ -121,9 +122,7 @@
                    {'image' : 'Wet_Tile.png'},
                    {'image' : 'Hat_Tile.png'},
                    {'image' : 'Feet_Tile.png'},
-                   {'image' : 'Bat_Tile.png'},
-                   {'image' : 'Bat_Tile.png'}                        
-               
+                   {'image' : 'Bat_Tile.png'}
                 ],
                 'animation' :           // Specify the animation to use.
                 {
@@ -233,7 +232,36 @@
                theWheel.segments[Tile_Num].changeImage(Value);
             }
 
+            const numTiles = theWheel.numSegments;
+            const optionContainer = document.getElementById('option-container');
+            const fileSelector = document.getElementById('file-selector');
+            fileSelector.addEventListener('change', (event) => {
+              // Reset contents if ones have been added previously
+              optionContainer.innerHTML = "";
 
+              const fileList = event.target.files;
+
+              // Outer loop creates each Select / Drop down menu
+              for (var i = 1; i <= numTiles; i++) {
+                console.log("Creating Select: " + i);
+                //<select id="Tile_1" name="Tile_1" onchange="tile_change(1, this.value);" >
+                var currSelect = document.createElement('select');
+                currSelect.id = "Tile_" + i;
+                currSelect.name = "Tile_" + i;
+                currSelect.setAttribute('onchange', "tile_change(" + i + ", this.value);");
+
+                // Create the options from the files and populate the select with them
+                for (var j = 0; j < fileList.length; j++) {
+                  var option = document.createElement('option');
+                  option.value = fileList[j].webkitRelativePath;
+                  option.appendChild(document.createTextNode(fileList[j].name));
+                  currSelect.appendChild(option);
+                }
+
+                // Add Generated Select with Option to container for
+                optionContainer.appendChild(currSelect);
+              }
+            });
         </script>
     </body>
 </html>
